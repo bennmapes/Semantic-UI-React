@@ -679,6 +679,20 @@ export default class Dropdown extends Component {
     }
   }
 
+  handleClearIconClick = (e) => {
+    const { clearable } = this.props
+    const hasValue = this.hasValue()
+    debug('handleIconClick()', { e, clearable, hasValue })
+
+    _.invoke(this.props, 'onClick', e, this.props)
+    // prevent handleClick()
+    e.stopPropagation()
+
+    if (hasValue) {
+      this.clearValue(e)
+    }
+  }
+
   handleItemClick = (e, item) => {
     debug('handleItemClick()', item)
 
@@ -1019,7 +1033,7 @@ export default class Dropdown extends Component {
   // ----------------------------------------
 
   handleIconOverrides = (predefinedProps) => {
-    const { clearable } = this.props
+    const clearable = false
     const classes = cx(clearable && this.hasValue() && 'clear', predefinedProps.className)
 
     return {
@@ -1027,6 +1041,19 @@ export default class Dropdown extends Component {
       onClick: (e) => {
         _.invoke(predefinedProps, 'onClick', e, predefinedProps)
         this.handleIconClick(e)
+      },
+    }
+  }
+
+  handleClearIconOverrides = (predefinedProps) => {
+    const { clearable } = this.props
+    const classes = cx(clearable && this.hasValue(), predefinedProps.className)
+
+    return {
+      className: classes,
+      onClick: (e) => {
+        _.invoke(predefinedProps, 'onClick', e, predefinedProps)
+        this.handleClearIconClick(e)
       },
     }
   }
@@ -1193,7 +1220,7 @@ export default class Dropdown extends Component {
       search && searchQuery && 'filtered',
     )
     let _text = placeholder
-    
+
     if (text) {
       _text = text
     } else if (open && !multiple) {
@@ -1389,6 +1416,10 @@ export default class Dropdown extends Component {
           onChange={this.handleChange}
           tabIndex={this.computeTabIndex()}
         >
+          {Icon.create('remove', {
+            overrideProps: this.handleClearIconOverrides,
+            autoGenerateKey: false,
+          })}
           {this.renderLabels()}
           {this.renderSearchInput()}
           {this.renderSearchSizer()}
