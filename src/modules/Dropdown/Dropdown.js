@@ -647,20 +647,19 @@ export default class Dropdown extends Component {
     const { minCharacters, search } = this.props
     const { open, searchQuery } = this.state
 
+    if (open) {
+      _.invoke(this.searchRef.current, 'focus')
+    }
     _.invoke(this.props, 'onClick', e, this.props)
     // prevent closeOnDocumentClick()
     e.stopPropagation()
 
     if (!search) return this.toggle(e)
-    if (open) {
-      _.invoke(this.searchRef.current, 'focus')
-      return
-    }
-    if (searchQuery.length >= minCharacters || minCharacters === 1) {
+
+    if (!open && (searchQuery.length >= minCharacters || minCharacters === 1)) {
       this.open(e)
-      return
     }
-    _.invoke(this.searchRef.current, 'focus')
+    // _.invoke(this.searchRef.current, 'focus')
   }
 
   handleIconClick = (e) => {
@@ -737,6 +736,7 @@ export default class Dropdown extends Component {
     if (focus) return
 
     _.invoke(this.props, 'onFocus', e, this.props)
+    console.log('Focus!')
     this.setState({ focus: true })
   }
 
@@ -1042,6 +1042,7 @@ export default class Dropdown extends Component {
         _.invoke(predefinedProps, 'onClick', e, predefinedProps)
         this.handleIconClick(e)
       },
+      disabled: !this.hasValue(),
     }
   }
 
